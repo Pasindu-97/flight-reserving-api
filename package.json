@@ -1,0 +1,53 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "npx tsc",
+    "test": "jest",
+    "start": "npx tsc && nodemon dist/index.js",
+    "dev": "nodemon src/index.ts",
+    "typeorm": "node --require ts-node/register ./node_modules/typeorm/cli.js --config app-data-source.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@prisma/client": "^5.5.2",
+    "@types/cookie-parser": "^1.4.6",
+    "bcrypt": "^5.1.1",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-validator": "^7.0.1",
+    "jsonwebtoken": "^9.0.2",
+    "pg": "^8.11.3",
+    "reflect-metadata": "^0.1.13",
+    "socket.io": "^4.7.2",
+    "swagger-ui-express": "^5.0.0",
+    "typeorm": "^0.3.17",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
+    "@types/cors": "^2.8.15",
+    "@types/dotenv": "^8.2.0",
+    "@types/express": "^4.17.20",
+    "@types/jest": "^29.5.8",
+    "@types/jsonwebtoken": "^9.0.4",
+    "@types/node": "^20.8.10",
+    "@types/supertest": "^2.0.16",
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
+    "esbuild-register": "^3.5.0",
+    "jest": "^29.7.0",
+    "nodemon": "^3.0.1",
+    "prisma": "^5.5.2",
+    "superagent": "^8.1.2",
+    "supertest": "^6.3.3",
+    "ts-jest": "^29.1.1",
+    "typescript": "^5.2.2"
+  }
+}
