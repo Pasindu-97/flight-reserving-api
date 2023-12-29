@@ -161,3 +161,19 @@ export const deleteFlight = async (request: Request, response: Response) => {
     return response.status(500).json(error.message);
   }
 };
+
+// DELETE: Delete a flight based on the id
+export const deleteFlightUser = async (
+  request: Request,
+  response: Response
+) => {
+  const id: string = request.params.id;
+  try {
+    await FlightUserService.deleteFlightUser(id);
+    return response
+      .status(204)
+      .json("Reservation has been successfully deleted");
+  } catch (error: any) {
+    return response.status(500).json(error.message);
+  }
+};

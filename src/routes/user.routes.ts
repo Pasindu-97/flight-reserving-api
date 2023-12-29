@@ -7,12 +7,12 @@ import { AuthenticationMiddleware } from "../middlewares/auth.middleware";
 
 export const userRouter = express.Router();
 
-userRouter.get("/", AuthenticationMiddleware("ADMIN"), UserController.getUsers);
+userRouter.get("/", AuthenticationMiddleware("USER"), UserController.getUsers);
 userRouter.get("/detail", UserController.getUserdetail);
 
 userRouter.get(
   "/:id",
-  AuthenticationMiddleware("ADMIN"),
+  AuthenticationMiddleware("USER"),
   UserController.getUser
 );
 
@@ -27,7 +27,7 @@ userRouter.post(
 
 userRouter.put(
   "/:id",
-  AuthenticationMiddleware("ADMIN"),
+  AuthenticationMiddleware("USER"),
   body("username").isString(),
   body("email").isString(),
   body("password").isString(),
@@ -37,6 +37,6 @@ userRouter.put(
 
 userRouter.delete(
   "/:id",
-  AuthenticationMiddleware("ADMIN"),
+  AuthenticationMiddleware("USER"),
   UserController.deleteUser
 );

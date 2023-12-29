@@ -13,6 +13,7 @@ export type FlightUserObject = {
   cost: number;
 };
 export type ReservedFlightUserObject = {
+  id: string;
   createdAt: Date;
   flightName: string;
   numberOfSeats: number;
@@ -38,6 +39,7 @@ export const getFlightUserByUserId = async (
 
   const reservedFlightUsers: ReservedFlightUserObject[] = flightUsers.map(
     (flightUser) => ({
+      id: flightUser.id,
       createdAt: flightUser.createdAt,
       flightName: flightUser.flight.flightName,
       numberOfSeats: flightUser.numberOfSeats,

@@ -6,9 +6,17 @@ import { AuthenticationMiddleware } from "../middlewares/auth.middleware";
 
 export const flightRouter = express.Router();
 
-flightRouter.get("/", FlightContoller.getFlights);
+flightRouter.get(
+  "/",
+  AuthenticationMiddleware("USER"),
+  FlightContoller.getFlights
+);
 
-flightRouter.get("find/:id", FlightContoller.getFlightById);
+flightRouter.get(
+  "find/:id",
+  AuthenticationMiddleware("USER"),
+  FlightContoller.getFlightById
+);
 
 flightRouter.post(
   "/",
@@ -22,7 +30,7 @@ flightRouter.post(
 
 flightRouter.put(
   "/:id",
-  AuthenticationMiddleware("ADMIN"),
+  AuthenticationMiddleware("USER"),
   body("flightName").isString(),
   body("departure").isString(),
   body("destination").isString(),
@@ -33,15 +41,26 @@ flightRouter.put(
 
 flightRouter.delete(
   "/:id",
-  AuthenticationMiddleware("ADMIN"),
+  AuthenticationMiddleware("USER"),
   FlightContoller.deleteFlight
 );
 
 flightRouter.post(
   "/reserve",
+  AuthenticationMiddleware("USER"),
   body("flightId").isString(),
   body("numberOfSeats").isNumeric(),
   FlightContoller.flightReserve
 );
 
-flightRouter.get("/reserve", FlightContoller.reservedFlights);
+flightRouter.get(
+  "/reserve",
+  AuthenticationMiddleware("USER"),
+  FlightContoller.reservedFlights
+);
+
+flightRouter.delete(
+  "/reserve/:id",
+  AuthenticationMiddleware("USER"),
+  FlightContoller.deleteFlightUser
+);
