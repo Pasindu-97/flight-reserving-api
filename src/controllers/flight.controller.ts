@@ -2,6 +2,16 @@ import type { Request, Response } from "express";
 import { body, validationResult } from "express-validator";
 
 import * as FlightService from "../services/flight.services";
+import * as FlightUserService from "../services/flightUser.service";
+import * as UserService from "../services/user.services";
+import jwt from "jsonwebtoken";
+import * as dotenv from "dotenv";
+dotenv.config();
+
+const accessSecret: string = process.env.JWT_ACCESS_SECRET || "";
+interface ParsedCookies {
+  [key: string]: string;
+}
 
 // GET: List of all flights
 export const getFlights = async (request: Request, response: Response) => {
@@ -69,6 +79,102 @@ export const updateFlight = async (request: Request, response: Response) => {
     return response.status(200).json(updateFlight);
   } catch (error: any) {
     return response.status(500).json(error.message);
+  }
+};
+
+// POST: Reserve a flight
+export const flightReserve = async (request: Request, response: Response) => {
+  try {
+    const list: ParsedCookies = {};
+    const cookieHeader = request.headers?.cookie;
+    if (cookieHeader == undefined)
+      return response.status(401).json({ message: "Unauthorized access" });
+    cookieHeader.split(`;`).forEach(function (cookie) {
+      let [name, ...rest] = cookie.split(`=`);
+      name = name?.trim();
+      if (!name) return;
+      const value = rest.join(`=`).trim();
+      if (!value) return;
+      list[name] = decodeURIComponent(value);
+    });
+    const token = list["accessToken"];
+    if (!token)
+      return response.status(401).json({ message: "Unauthorized access" });
+    try {
+      const decodedToken = jwt.verify(token, accessSecret) as {
+        userId: string;
+      };
+      const id: string = decodedToken.userId;
+      try {
+        const user = await UserService.getUser(id);
+        if (user) {
+          try {
+            const flightUser = request.body;
+            flightUser.userId = id;
+            const createFlightUser = await FlightUserService.createFlightUser(
+              flightUser
+            );
+            return response.status(200).json(createFlightUser);
+          } catch (error: any) {
+            return response.status(500).json(error.message);
+          }
+        }
+        return response.status(404).json("User could not be found");
+      } catch (error: any) {
+        return response.status(500).json(error.message);
+      }
+    } catch {
+      return response.status(401).json({ message: "Unauthorized access" });
+    }
+  } catch {
+    return response.status(401).json({ message: "Unauthorized access" });
+  }
+};
+
+// GET: get Reserved flights for requested user
+export const reservedFlights = async (request: Request, response: Response) => {
+  try {
+    const list: ParsedCookies = {};
+    const cookieHeader = request.headers?.cookie;
+    if (cookieHeader == undefined)
+      return response.status(401).json({ message: "Unauthorized access" });
+    cookieHeader.split(`;`).forEach(function (cookie) {
+      let [name, ...rest] = cookie.split(`=`);
+      name = name?.trim();
+      if (!name) return;
+      const value = rest.join(`=`).trim();
+      if (!value) return;
+      list[name] = decodeURIComponent(value);
+    });
+    const token = list["accessToken"];
+    if (!token)
+      return response.status(401).json({ message: "Unauthorized access" });
+    try {
+      const decodedToken = jwt.verify(token, accessSecret) as {
+        userId: string;
+      };
+      const id: string = decodedToken.userId;
+      try {
+        const user = await UserService.getUser(id);
+        if (user) {
+          try {
+            const FlightUsers = await FlightUserService.getFlightUserByUserId(
+              id
+            );
+            return response.status(200).json(FlightUsers);
+          } catch (error: any) {
+            return response.status(500).json(error.message);
+          }
+        }
+        return response.status(404).json("User could not be found");
+      } catch (error: any) {
+        return response.status(500).json(error.message);
+      }
+    } catch {
+      return response.status(401).json({ message: "Unauthorized access" });
+    }
+  } catch {
+    return response.status(401).json({ message: "Unauthorized access" });
   }
 };
 

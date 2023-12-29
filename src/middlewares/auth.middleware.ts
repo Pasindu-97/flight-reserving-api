@@ -46,7 +46,7 @@ export const AuthenticationMiddleware =
         if (error.name === "TokenExpiredError") {
           return AuthController.refresh;
         } else {
-          return response.status(401).json({ message: "Unauthorized access" });
+          return response.status(401).json({ message: "Token is expired" });
         }
       }
     } catch {

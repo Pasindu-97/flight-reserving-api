@@ -8,15 +8,10 @@ export const flightRouter = express.Router();
 
 flightRouter.get("/", FlightContoller.getFlights);
 
-flightRouter.get(
-  "/:id",
-  AuthenticationMiddleware("USER"),
-  FlightContoller.getFlightById
-);
+flightRouter.get("find/:id", FlightContoller.getFlightById);
 
 flightRouter.post(
   "/",
-  AuthenticationMiddleware("ADMIN"),
   body("flightName").isString(),
   body("departure").isString(),
   body("destination").isString(),
@@ -41,3 +36,12 @@ flightRouter.delete(
   AuthenticationMiddleware("ADMIN"),
   FlightContoller.deleteFlight
 );
+
+flightRouter.post(
+  "/reserve",
+  body("flightId").isString(),
+  body("numberOfSeats").isNumeric(),
+  FlightContoller.flightReserve
+);
+
+flightRouter.get("/reserve", FlightContoller.reservedFlights);

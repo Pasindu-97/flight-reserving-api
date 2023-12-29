@@ -7,8 +7,11 @@ import {
   UpdateDateColumn,
   ManyToMany,
   JoinTable,
+  ManyToOne,
+  OneToMany,
 } from "typeorm";
 import { User } from "./user";
+import { FlightUser } from "./flightUser";
 
 @Entity()
 export class Flight extends BaseEntity {
@@ -36,7 +39,6 @@ export class Flight extends BaseEntity {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @ManyToMany(() => User)
-  @JoinTable()
-  passengers: User[];
+  @OneToMany(() => FlightUser, (flightUser) => flightUser.flight)
+  flightUsers: FlightUser[];
 }
