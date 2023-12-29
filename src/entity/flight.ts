@@ -5,9 +5,6 @@ import {
   BaseEntity,
   CreateDateColumn,
   UpdateDateColumn,
-  ManyToMany,
-  JoinTable,
-  ManyToOne,
   OneToMany,
 } from "typeorm";
 import { User } from "./user";
