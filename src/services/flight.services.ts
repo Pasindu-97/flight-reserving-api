@@ -1,6 +1,4 @@
 import { Flight } from "../entity/flight";
-import { User } from "../entity/user";
-import { UserObject } from "./user.services";
 
 export type FlightObject = {
   id: string;

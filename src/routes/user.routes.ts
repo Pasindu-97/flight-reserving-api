@@ -1,6 +1,5 @@
 import express from "express";
-import type { Request, Response } from "express";
-import { body, validationResult } from "express-validator";
+import { body } from "express-validator";
 
 import * as UserController from "../controllers/user.controllers";
 import { AuthenticationMiddleware } from "../middlewares/auth.middleware";

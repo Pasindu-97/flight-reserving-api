@@ -5,11 +5,8 @@ import {
   BaseEntity,
   CreateDateColumn,
   UpdateDateColumn,
-  ManyToMany,
   OneToMany,
-  JoinTable,
 } from "typeorm";
-import { Flight } from "./flight";
 import { FlightUser } from "./flightUser";
 
 export enum Role {
