@@ -13,6 +13,43 @@ interface ParsedCookies {
   [key: string]: string;
 }
 
+const getUserIdFromRequest = async (
+  request: Request
+): Promise<string | null> => {
+  const list: ParsedCookies = {};
+  const cookieHeader = request.headers?.cookie;
+
+  if (cookieHeader === undefined) return null;
+
+  cookieHeader.split(";").forEach(function (cookie) {
+    let [name, ...rest] = cookie.split("=");
+    name = name?.trim();
+    if (!name) return;
+    const value = rest.join("=").trim();
+    if (!value) return;
+    list[name] = decodeURIComponent(value);
+  });
+
+  const token = list["accessToken"];
+  if (!token) return null;
+
+  try {
+    const decodedToken = jwt.verify(token, accessSecret) as { userId: string };
+    const userId: string = decodedToken.userId;
+    try {
+      const user = await UserService.getUser(userId);
+      if (user) {
+        return userId;
+      }
+      return null;
+    } catch (error: any) {
+      return null;
+    }
+  } catch {
+    return null;
+  }
+};
+
 // GET: List of all flights
 export const getFlights = async (request: Request, response: Response) => {
   try {
@@ -84,98 +121,34 @@ export const updateFlight = async (request: Request, response: Response) => {
 
 // POST: Reserve a flight
 export const flightReserve = async (request: Request, response: Response) => {
-  try {
-    const list: ParsedCookies = {};
-    const cookieHeader = request.headers?.cookie;
-    if (cookieHeader == undefined)
-      return response.status(401).json({ message: "Unauthorized access" });
-    cookieHeader.split(`;`).forEach(function (cookie) {
-      let [name, ...rest] = cookie.split(`=`);
-      name = name?.trim();
-      if (!name) return;
-      const value = rest.join(`=`).trim();
-      if (!value) return;
-      list[name] = decodeURIComponent(value);
-    });
-    const token = list["accessToken"];
-    if (!token)
-      return response.status(401).json({ message: "Unauthorized access" });
+  const userId = await getUserIdFromRequest(request);
+  if (userId) {
     try {
-      const decodedToken = jwt.verify(token, accessSecret) as {
-        userId: string;
-      };
-      const id: string = decodedToken.userId;
-      try {
-        const user = await UserService.getUser(id);
-        if (user) {
-          try {
-            const flightUser = request.body;
-            flightUser.userId = id;
-            const createFlightUser = await FlightUserService.createFlightUser(
-              flightUser
-            );
-            return response.status(200).json(createFlightUser);
-          } catch (error: any) {
-            return response.status(500).json(error.message);
-          }
-        }
-        return response.status(404).json("User could not be found");
-      } catch (error: any) {
-        return response.status(500).json(error.message);
-      }
-    } catch {
-      return response.status(401).json({ message: "Unauthorized access" });
+      const flightUser = request.body;
+      flightUser.userId = userId;
+      const createFlightUser = await FlightUserService.createFlightUser(
+        flightUser
+      );
+      return response.status(200).json(createFlightUser);
+    } catch (error: any) {
+      return response.status(500).json(error.message);
     }
-  } catch {
-    return response.status(401).json({ message: "Unauthorized access" });
   }
+  return response.status(404).json("Unauthorized access");
 };
 
 // GET: get Reserved flights for requested user
 export const reservedFlights = async (request: Request, response: Response) => {
-  try {
-    const list: ParsedCookies = {};
-    const cookieHeader = request.headers?.cookie;
-    if (cookieHeader == undefined)
-      return response.status(401).json({ message: "Unauthorized access" });
-    cookieHeader.split(`;`).forEach(function (cookie) {
-      let [name, ...rest] = cookie.split(`=`);
-      name = name?.trim();
-      if (!name) return;
-      const value = rest.join(`=`).trim();
-      if (!value) return;
-      list[name] = decodeURIComponent(value);
-    });
-    const token = list["accessToken"];
-    if (!token)
-      return response.status(401).json({ message: "Unauthorized access" });
+  const userId = await getUserIdFromRequest(request);
+  if (userId) {
     try {
-      const decodedToken = jwt.verify(token, accessSecret) as {
-        userId: string;
-      };
-      const id: string = decodedToken.userId;
-      try {
-        const user = await UserService.getUser(id);
-        if (user) {
-          try {
-            const FlightUsers = await FlightUserService.getFlightUserByUserId(
-              id
-            );
-            return response.status(200).json(FlightUsers);
-          } catch (error: any) {
-            return response.status(500).json(error.message);
-          }
-        }
-        return response.status(404).json("User could not be found");
-      } catch (error: any) {
-        return response.status(500).json(error.message);
-      }
-    } catch {
-      return response.status(401).json({ message: "Unauthorized access" });
+      const FlightUsers = await FlightUserService.getFlightUserByUserId(userId);
+      return response.status(200).json(FlightUsers);
+    } catch (error: any) {
+      return response.status(500).json(error.message);
     }
-  } catch {
-    return response.status(401).json({ message: "Unauthorized access" });
   }
+  return response.status(404).json("Unauthorized access");
 };
 
 // DELETE: Delete a flight based on the id
