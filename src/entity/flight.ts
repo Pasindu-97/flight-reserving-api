@@ -24,10 +24,10 @@ export class Flight extends BaseEntity {
   @Column({ type: "varchar", length: 255 })
   destination: string;
 
-  @Column({ type: "time" })
+  @Column({ type: "date" })
   date: string;
 
-  @Column({ type: "date" })
+  @Column({ type: "time" })
   time: string;
 
   @CreateDateColumn()
