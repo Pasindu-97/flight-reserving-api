@@ -13,9 +13,15 @@ flightRouter.get(
 );
 
 flightRouter.get(
-  "find/:id",
+  "/find-id/:id",
   AuthenticationMiddleware("USER"),
   FlightContoller.getFlightById
+);
+
+flightRouter.get(
+  "/find-name/:name",
+  AuthenticationMiddleware("USER"),
+  FlightContoller.getFlightByName
 );
 
 flightRouter.post(

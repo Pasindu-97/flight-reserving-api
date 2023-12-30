@@ -7,7 +7,6 @@ export type FlightObject = {
   destination: string;
   date: string;
   time: string;
-  // passengers: User[];
 };
 
 export const listFlights = async (): Promise<FlightObject[]> => {
